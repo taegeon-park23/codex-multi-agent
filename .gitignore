@@ -1,0 +1,6 @@
+.env
+.codex/environments/
+.idea/
+.vscode/
+*.log
+

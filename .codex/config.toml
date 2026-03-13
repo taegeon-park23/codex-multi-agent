@@ -1,0 +1,5 @@
+# Repo-scoped Codex defaults for the bootstrap stage.
+# Keep work inside the checked-out repository unless explicitly escalated.
+sandbox_mode = "workspace-write"
+personality = "pragmatic"
+

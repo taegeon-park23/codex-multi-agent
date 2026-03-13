@@ -1,0 +1,14 @@
+name: ${COMPOSE_PROJECT_NAME:-repo-foundation}
+
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: docker/workspace/Dockerfile
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    stdin_open: true
+    tty: true
+    command: bash
+

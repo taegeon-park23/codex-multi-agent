@@ -1,0 +1,5 @@
+.git
+.codex/environments
+.env
+*.log
+
