@@ -13,6 +13,7 @@ Constraints:
 - do not modify files
 - do not recommend dangerous or hidden approval bypasses
 - do not invent product requirements
+- do not call request_user_input or other interactive tools; put missing information into open questions and assumptions instead
 
 When reporting back to the parent agent:
 - keep output concise

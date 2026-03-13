@@ -1,0 +1,393 @@
+version: 1
+description: "Repo-managed skill routing catalog for supervised planning."
+skills:
+  - display_name: "Supervisor Plan"
+    invocation_name: "supervisor-plan"
+    probable_invocation_name: "supervisor-plan"
+    invocation_name_status: "confirmed"
+    source_scope: "repo"
+    primary_use_cases:
+      - "read-only supervisor planning"
+      - "task decomposition"
+      - "routing analysis"
+    should_trigger_for:
+      - "new task planning"
+      - "architecture shaping"
+      - "risk analysis"
+      - "task breakdown"
+    should_not_trigger_for:
+      - "approved file mutation"
+      - "post-execution review"
+    prerequisites:
+      - "repository is open in Codex app or terminal"
+    safe_phase:
+      - "planning"
+    mutates_files: false
+    requires_external_context: false
+    example_prompt: "Use $supervisor-plan to inspect the skill catalog first and then produce a read-only routed plan."
+    confidence_of_mapping: "high"
+
+  - display_name: "Supervisor Execute"
+    invocation_name: "supervisor-execute"
+    probable_invocation_name: "supervisor-execute"
+    invocation_name_status: "confirmed"
+    source_scope: "repo"
+    primary_use_cases:
+      - "approved execution handoff"
+      - "isolated worktree execution"
+    should_trigger_for:
+      - "approved plan execution"
+      - "bounded implementation handoff"
+    should_not_trigger_for:
+      - "initial planning"
+      - "read-only review"
+    prerequisites:
+      - "approved plan run id"
+      - "explicit supervisor approval note"
+      - "git worktree creation must succeed"
+    safe_phase:
+      - "execution"
+    mutates_files: true
+    requires_external_context: false
+    example_prompt: "Use $supervisor-execute to run only the already approved plan slice in an isolated worktree."
+    confidence_of_mapping: "high"
+
+  - display_name: "Supervisor Review"
+    invocation_name: "supervisor-review"
+    probable_invocation_name: "supervisor-review"
+    invocation_name_status: "confirmed"
+    source_scope: "repo"
+    primary_use_cases:
+      - "read-only run review"
+      - "post-execution validation"
+      - "risk summarization"
+    should_trigger_for:
+      - "reviewing a planning run"
+      - "reviewing an execution run"
+      - "reviewing a worktree"
+    should_not_trigger_for:
+      - "initial implementation"
+      - "direct execution"
+    prerequisites:
+      - "target run id or target path when reviewing a specific result"
+    safe_phase:
+      - "review"
+    mutates_files: false
+    requires_external_context: false
+    example_prompt: "Use $supervisor-review to review a run or worktree in read-only mode and summarize the findings."
+    confidence_of_mapping: "high"
+
+  - display_name: "Figma"
+    invocation_name: "figma"
+    probable_invocation_name: "figma"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "design context inspection"
+      - "figma node and screenshot retrieval"
+      - "figma setup and troubleshooting"
+    should_trigger_for:
+      - "tasks with figma URLs or node ids"
+      - "design-to-code planning"
+      - "figma mcp setup"
+    should_not_trigger_for:
+      - "tasks without design context"
+      - "non-figma architecture planning"
+    prerequisites:
+      - "working Figma MCP connection"
+      - "Figma URL or selected node context"
+    safe_phase:
+      - "planning"
+      - "execution"
+      - "review"
+    mutates_files: "unknown"
+    requires_external_context: true
+    example_prompt: "Use $figma to inspect the provided Figma node and summarize the relevant design context."
+    confidence_of_mapping: "high"
+
+  - display_name: "Figma Implement Design"
+    invocation_name: "figma-implement-design"
+    probable_invocation_name: "figma-implement-design"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "design implementation from Figma"
+      - "pixel-accurate design translation"
+    should_trigger_for:
+      - "approved implementation from a Figma design"
+      - "component implementation that must match Figma"
+    should_not_trigger_for:
+      - "design-free planning"
+      - "read-only architecture brainstorming"
+    prerequisites:
+      - "working Figma MCP connection"
+      - "Figma URL or selected node context"
+      - "approved execution scope"
+    safe_phase:
+      - "execution"
+    mutates_files: true
+    requires_external_context: true
+    example_prompt: "Use $figma-implement-design to implement the approved Figma design slice in the current codebase."
+    confidence_of_mapping: "high"
+
+  - display_name: "Image Gen"
+    invocation_name: "imagegen"
+    probable_invocation_name: "imagegen"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "image generation"
+      - "image editing"
+      - "game and product asset creation"
+    should_trigger_for:
+      - "requests for generated or edited images"
+      - "concept art or marketing asset work"
+    should_not_trigger_for:
+      - "pure text planning"
+      - "non-visual code review"
+    prerequisites:
+      - "OPENAI_API_KEY"
+      - "Python dependencies for the skill"
+      - "approved asset generation scope if outputs should be written to the repo"
+    safe_phase:
+      - "execution"
+    mutates_files: true
+    requires_external_context: true
+    example_prompt: "Use $imagegen to generate the approved image assets and return the final prompts and output paths."
+    confidence_of_mapping: "high"
+
+  - display_name: "OpenAI Docs"
+    invocation_name: "openai-docs"
+    probable_invocation_name: "openai-docs"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "official OpenAI documentation lookup"
+      - "model selection guidance"
+      - "OpenAI upgrade guidance"
+    should_trigger_for:
+      - "OpenAI API questions"
+      - "model choice questions"
+      - "latest OpenAI docs validation"
+    should_not_trigger_for:
+      - "non-OpenAI product questions"
+      - "local implementation planning without OpenAI dependencies"
+    prerequisites:
+      - "OpenAI developer docs MCP access for the best experience"
+    safe_phase:
+      - "planning"
+      - "review"
+    mutates_files: false
+    requires_external_context: true
+    example_prompt: "Use $openai-docs to verify the relevant official OpenAI documentation and summarize the implications."
+    confidence_of_mapping: "high"
+
+  - display_name: "Playwright CLI Skill"
+    invocation_name: "playwright"
+    probable_invocation_name: "playwright"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "browser automation from the terminal"
+      - "UI flow debugging"
+      - "browser-based data extraction"
+    should_trigger_for:
+      - "real browser interaction tasks"
+      - "terminal-driven UI automation"
+      - "headed browser checks"
+    should_not_trigger_for:
+      - "non-browser systems"
+      - "read-only task decomposition without a runnable target"
+    prerequisites:
+      - "npx must be available"
+      - "target app or URL must be reachable"
+    safe_phase:
+      - "review"
+      - "execution"
+    mutates_files: "unknown"
+    requires_external_context: true
+    example_prompt: "Use $playwright to automate the browser workflow against the target URL and capture the evidence."
+    confidence_of_mapping: "high"
+
+  - display_name: "Playwright Interactive"
+    invocation_name: "playwright-interactive"
+    probable_invocation_name: "playwright-interactive"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "persistent browser QA"
+      - "Electron debugging"
+      - "interactive UI debugging"
+    should_trigger_for:
+      - "persistent UI debugging"
+      - "Electron app inspection"
+      - "interactive browser QA with reusable handles"
+    should_not_trigger_for:
+      - "planning without a runnable target"
+      - "tasks that cannot justify danger-full-access"
+    prerequisites:
+      - "js_repl enabled"
+      - "new Codex session after enabling js_repl"
+      - "sandbox danger-full-access for the current workflow"
+      - "local target app or Electron workspace"
+    safe_phase:
+      - "review"
+      - "execution"
+    mutates_files: "unknown"
+    requires_external_context: true
+    example_prompt: "Use $playwright-interactive to inspect the running UI in a persistent Playwright session and capture QA evidence."
+    confidence_of_mapping: "high"
+
+  - display_name: "Screenshot Capture"
+    invocation_name: "screenshot"
+    probable_invocation_name: "screenshot"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "desktop screenshots"
+      - "window capture"
+      - "OS-level visual capture"
+    should_trigger_for:
+      - "explicit screenshot requests"
+      - "desktop app capture when a better-integrated tool is unavailable"
+    should_not_trigger_for:
+      - "browser tasks already covered by Playwright"
+      - "planning-only tasks"
+    prerequisites:
+      - "OS-level screenshot permissions where required"
+    safe_phase:
+      - "review"
+    mutates_files: true
+    requires_external_context: true
+    example_prompt: "Use $screenshot to capture the requested window or screen and return the saved file path."
+    confidence_of_mapping: "high"
+
+  - display_name: "Security Best Practices"
+    invocation_name: "security-best-practices"
+    probable_invocation_name: "security-best-practices"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "security review"
+      - "secure-by-default guidance"
+      - "security report generation"
+    should_trigger_for:
+      - "explicit security review requests"
+      - "secure-by-default coding guidance"
+      - "best-practices security reports"
+    should_not_trigger_for:
+      - "general non-security code review"
+      - "non-security planning"
+    prerequisites:
+      - "supported language or framework context"
+      - "explicit security focus from the task"
+    safe_phase:
+      - "planning"
+      - "review"
+    mutates_files: "unknown"
+    requires_external_context: false
+    example_prompt: "Use $security-best-practices to review the repository for secure-by-default issues and summarize the highest-priority risks."
+    confidence_of_mapping: "high"
+
+  - display_name: "Security Ownership Map"
+    invocation_name: "security-ownership-map"
+    probable_invocation_name: "security-ownership-map"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "security ownership analysis"
+      - "bus factor analysis"
+      - "sensitive-code ownership mapping"
+    should_trigger_for:
+      - "security ownership questions"
+      - "bus factor analysis for sensitive code"
+      - "CODEOWNERS reality checks"
+    should_not_trigger_for:
+      - "general maintainer lists"
+      - "non-security architecture planning"
+    prerequisites:
+      - "git history available"
+      - "python and networkx when executing the full workflow"
+    safe_phase:
+      - "review"
+    mutates_files: true
+    requires_external_context: false
+    example_prompt: "Use $security-ownership-map to analyze security ownership risks and export the relevant findings."
+    confidence_of_mapping: "high"
+
+  - display_name: "Security Threat Model"
+    invocation_name: "security-threat-model"
+    probable_invocation_name: "security-threat-model"
+    invocation_name_status: "confirmed"
+    source_scope: "user"
+    primary_use_cases:
+      - "repository-grounded threat modeling"
+      - "abuse path analysis"
+      - "mitigation planning"
+    should_trigger_for:
+      - "explicit threat modeling requests"
+      - "abuse path analysis"
+      - "security architecture review"
+    should_not_trigger_for:
+      - "general architecture summaries without security scope"
+      - "routine non-security review"
+    prerequisites:
+      - "repository or in-scope path"
+      - "explicit security or threat-modeling intent"
+    safe_phase:
+      - "planning"
+      - "review"
+    mutates_files: true
+    requires_external_context: false
+    example_prompt: "Use $security-threat-model to produce a repository-grounded threat model with prioritized abuse paths and mitigations."
+    confidence_of_mapping: "high"
+
+  - display_name: "Skill Creator"
+    invocation_name: "skill-creator"
+    probable_invocation_name: "skill-creator"
+    invocation_name_status: "confirmed"
+    source_scope: "system"
+    primary_use_cases:
+      - "creating or updating skills"
+      - "skill metadata generation"
+      - "skill workflow design"
+    should_trigger_for:
+      - "new skill creation"
+      - "updating skill metadata"
+      - "skill design guidance"
+    should_not_trigger_for:
+      - "normal product planning"
+      - "general code implementation"
+    prerequisites:
+      - "the task is specifically about Codex skill creation or updates"
+    safe_phase:
+      - "planning"
+      - "execution"
+    mutates_files: true
+    requires_external_context: false
+    example_prompt: "Use $skill-creator to update the skill metadata and validate that the new skill guidance is coherent."
+    confidence_of_mapping: "high"
+
+  - display_name: "Skill Installer"
+    invocation_name: "skill-installer"
+    probable_invocation_name: "skill-installer"
+    invocation_name_status: "confirmed"
+    source_scope: "system"
+    primary_use_cases:
+      - "installing curated skills"
+      - "listing installable skills"
+      - "installing skills from repositories"
+    should_trigger_for:
+      - "skill installation requests"
+      - "listing available installable skills"
+    should_not_trigger_for:
+      - "normal project planning"
+      - "routing among already-installed skills"
+    prerequisites:
+      - "the task is specifically about installing or listing skills"
+    safe_phase:
+      - "execution"
+    mutates_files: true
+    requires_external_context: true
+    example_prompt: "Use $skill-installer to list or install the requested skill without changing unrelated workflow behavior."
+    confidence_of_mapping: "high"

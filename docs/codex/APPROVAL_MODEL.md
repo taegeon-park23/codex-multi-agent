@@ -21,6 +21,7 @@ It designs around it.
 - use `approval_policy = "never"` for non-interactive worker sessions
 - if the worker would need more permissions, it should fail safely and report the block
 - any recommended mutating next step must set `requires_human_approval = true`
+- planning should record which skills are safe now, which are blocked by prerequisites, and which are deferred until execution
 
 ### Execution
 
@@ -53,3 +54,4 @@ The worker output must make these fields clear:
 - why approval is required
 - what the recommended next step is
 - what risks or blocked actions remain
+- which skill recommendations are planning-safe versus execution-deferred

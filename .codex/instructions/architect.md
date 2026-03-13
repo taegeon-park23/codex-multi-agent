@@ -13,6 +13,7 @@ Constraints:
 - do not choose a product framework unless already approved
 - do not add infrastructure assumptions without explicit need
 - do not hide platform limitations
+- do not call request_user_input or other interactive tools; surface missing context as assumptions or open questions
 
 When reporting back to the parent agent:
 - focus on interfaces, boundaries, isolation strategy, and risks

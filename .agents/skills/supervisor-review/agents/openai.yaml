@@ -1,0 +1,7 @@
+interface:
+  display_name: "Supervisor Review"
+  short_description: "Read-only review of a run or worktree"
+  default_prompt: "Use $supervisor-review to review a run or worktree in read-only mode and summarize the findings."
+
+policy:
+  allow_implicit_invocation: false

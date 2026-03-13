@@ -17,6 +17,7 @@ Default path:
 
 - `scripts/orchestration/Invoke-SupervisorPlan.ps1`
   - read-only planning and analysis fan-out
+  - injects the repo-managed skill catalog and routing rules into the worker prompt context
 - `scripts/orchestration/Invoke-SupervisorExecute.ps1`
   - approved execution handoff in an isolated worktree
 - `scripts/orchestration/Invoke-SupervisorReview.ps1`
@@ -51,7 +52,7 @@ The artifact layer is therefore the visibility contract.
 
 The app should read and summarize:
 - `result.md` for quick supervisor-facing status
-- `result.json` for machine-readable fields such as `requires_human_approval`, `recommended_next_step`, `risks`, and `proposed_subtasks`
+- `result.json` for machine-readable fields such as `requires_human_approval`, `recommended_next_step`, `risks`, `proposed_subtasks`, and skill-routing decisions
 
 ## Profile usage
 
@@ -61,6 +62,10 @@ Bridge scripts use repo-local profiles from `.codex/config.toml`:
 - `supervisor_review`
 
 Those profiles set the root worker instructions, and the repo-local agent definitions provide the role-specific behavior for planner, architect, tester, reviewer, and implementer.
+
+For skill-aware planning, the bridge treats these files as durable prompt inputs:
+- `.codex/skill-routing/skills-catalog.yaml`
+- `.codex/skill-routing/routing-rules.md`
 
 ## Failure behavior
 

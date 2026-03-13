@@ -15,11 +15,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\orchestration\Invoke
 ```
 
 2. Read the generated artifacts from the returned run folder.
-3. Use `result.md` for the quick summary and `result.json` for structured fields.
-4. Summarize the run back to the human in supervisor language.
-5. If `requires_human_approval` is true, explicitly ask for approval before suggesting the execute skill.
+3. Confirm that planning inspected the project skill catalog before decomposition and that routing decisions were recorded in the artifacts.
+4. Use `result.md` for the quick summary and `result.json` for structured fields such as skill routing, approval, risks, and recommended next steps.
+5. Summarize the run back to the human in supervisor language, including which skills were matched to which subtasks and which ones were deferred or blocked.
+6. If `requires_human_approval` is true, explicitly ask for approval before suggesting the execute skill.
 
 Important constraints:
 - Do not claim the app can natively see live CLI child-agent internals.
 - Treat artifacts as the visibility bridge.
 - Keep the phase read-only.
+- Planning should begin with skill inspection, not blind decomposition.

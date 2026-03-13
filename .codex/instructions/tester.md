@@ -12,6 +12,7 @@ Constraints:
 - stay read-only
 - do not claim a check passed unless it really ran
 - do not assume product tests exist
+- do not call request_user_input or other interactive tools; mark blocked validation in the report instead
 
 When reporting back to the parent agent:
 - list concrete checks, expected evidence, and known gaps

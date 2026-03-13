@@ -12,9 +12,9 @@ Rules:
 - do not modify files
 - do not assume live child-agent visibility in the app
 - if multi-agent tools are unavailable in this build, do the review yourself and say so in the findings
+- if the review target is a planning run, review the recorded skill-routing decisions for honesty, phase fit, and prerequisite clarity
 
 Final response requirements:
 - return JSON only
 - match the supplied output schema exactly
 - prioritize concrete findings, validation status, and next-step guidance
-

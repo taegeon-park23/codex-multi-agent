@@ -383,6 +383,86 @@ function Format-OrchestrationList {
     return $lines
 }
 
+function ConvertTo-OrchestrationInlineValue {
+    param(
+        [object]$Value
+    )
+
+    if ($null -eq $Value) {
+        return "unknown"
+    }
+
+    if ($Value -is [bool]) {
+        return $Value.ToString().ToLowerInvariant()
+    }
+
+    $text = [string]$Value
+    if ([string]::IsNullOrWhiteSpace($text)) {
+        return "unknown"
+    }
+
+    return $text
+}
+
+function ConvertTo-OrchestrationInlineList {
+    param(
+        [object[]]$Items
+    )
+
+    if ($null -eq $Items -or $Items.Count -eq 0) {
+        return "none"
+    }
+
+    $values = @()
+    foreach ($item in $Items) {
+        $values += (ConvertTo-OrchestrationInlineValue -Value $item)
+    }
+
+    return ($values -join ", ")
+}
+
+function Format-OrchestrationSkillLabel {
+    param(
+        [object]$Skill
+    )
+
+    if ($null -eq $Skill) {
+        return "unknown skill"
+    }
+
+    $display = $null
+    if ($Skill.PSObject.Properties.Name -contains "display_name") {
+        $display = $Skill.display_name
+    }
+    if ([string]::IsNullOrWhiteSpace($display) -and ($Skill.PSObject.Properties.Name -contains "invocation_name")) {
+        $display = $Skill.invocation_name
+    }
+    if ([string]::IsNullOrWhiteSpace($display) -and ($Skill.PSObject.Properties.Name -contains "probable_invocation_name")) {
+        $display = $Skill.probable_invocation_name
+    }
+    if ([string]::IsNullOrWhiteSpace($display)) {
+        $display = "unknown skill"
+    }
+
+    $status = "unknown"
+    if ($Skill.PSObject.Properties.Name -contains "invocation_name_status") {
+        $status = ConvertTo-OrchestrationInlineValue -Value $Skill.invocation_name_status
+    }
+
+    $invoke = $null
+    if (($Skill.PSObject.Properties.Name -contains "invocation_name") -and -not [string]::IsNullOrWhiteSpace([string]$Skill.invocation_name)) {
+        $invoke = [string]$Skill.invocation_name
+    } elseif (($Skill.PSObject.Properties.Name -contains "probable_invocation_name") -and -not [string]::IsNullOrWhiteSpace([string]$Skill.probable_invocation_name)) {
+        $invoke = "probable=" + [string]$Skill.probable_invocation_name
+    }
+
+    if ([string]::IsNullOrWhiteSpace($invoke)) {
+        return ("{0} (status={1})" -f $display, $status)
+    }
+
+    return ("{0} (status={1}, invoke={2})" -f $display, $status, $invoke)
+}
+
 function Convert-OrchestrationResultToMarkdown {
     param(
         [Parameter(Mandatory = $true)]
@@ -417,6 +497,103 @@ function Convert-OrchestrationResultToMarkdown {
         $lines += @("## Approval", "", ("- Requires human approval: {0}" -f $approvalRequired.ToString().ToLowerInvariant()))
         if (($Result.PSObject.Properties.Name -contains "approval_reason") -and -not [string]::IsNullOrWhiteSpace($Result.approval_reason)) {
             $lines += ("- Approval reason: " + $Result.approval_reason)
+        }
+        $lines += ""
+    }
+
+    if ($Result.PSObject.Properties.Name -contains "skill_routing_summary") {
+        $lines += @("## Skill Routing Summary", "", $Result.skill_routing_summary, "")
+    }
+
+    if ($Result.PSObject.Properties.Name -contains "skill_inventory_checked") {
+        $lines += @("## Skill Inventory Checked", "")
+        if ($Result.skill_inventory_checked.Count -eq 0) {
+            $lines += "- none"
+        } else {
+            foreach ($skill in $Result.skill_inventory_checked) {
+                $lines += ("- {0}; scope={1}; safe_phase={2}; mutates_files={3}; external_context={4}; confidence={5}" -f (Format-OrchestrationSkillLabel -Skill $skill), (ConvertTo-OrchestrationInlineValue -Value $skill.source_scope), (ConvertTo-OrchestrationInlineList -Items $skill.safe_phase), (ConvertTo-OrchestrationInlineValue -Value $skill.mutates_files), (ConvertTo-OrchestrationInlineValue -Value $skill.requires_external_context), (ConvertTo-OrchestrationInlineValue -Value $skill.confidence_of_mapping))
+            }
+        }
+        $lines += ""
+    }
+
+    foreach ($section in @(
+        @{ Name = "recommended_skill_invocations"; Title = "Recommended Skill Invocations" },
+        @{ Name = "implicit_skill_candidates"; Title = "Implicit Skill Candidates" },
+        @{ Name = "explicit_skill_candidates"; Title = "Explicit Skill Candidates" }
+    )) {
+        if ($Result.PSObject.Properties.Name -contains $section.Name) {
+            $lines += @(("## {0}" -f $section.Title), "")
+            $items = $Result.$($section.Name)
+            if ($items.Count -eq 0) {
+                $lines += "- none"
+            } else {
+                foreach ($item in $items) {
+                    $lines += ("- {0}; use_mode={1}; phase={2}; reason={3}" -f (Format-OrchestrationSkillLabel -Skill $item), (ConvertTo-OrchestrationInlineValue -Value $item.use_mode), (ConvertTo-OrchestrationInlineValue -Value $item.phase), (ConvertTo-OrchestrationInlineValue -Value $item.reason))
+                    $lines += ("  - subtasks: {0}" -f (ConvertTo-OrchestrationInlineList -Items $item.subtasks))
+                }
+            }
+            $lines += ""
+        }
+    }
+
+    if ($Result.PSObject.Properties.Name -contains "skills_blocked_by_prerequisites") {
+        $lines += @("## Skills Blocked By Prerequisites", "")
+        if ($Result.skills_blocked_by_prerequisites.Count -eq 0) {
+            $lines += "- none"
+        } else {
+            foreach ($item in $Result.skills_blocked_by_prerequisites) {
+                $lines += ("- {0}: {1}" -f (Format-OrchestrationSkillLabel -Skill $item), (ConvertTo-OrchestrationInlineValue -Value $item.blocking_reason))
+                $lines += ("  - missing prerequisites: {0}" -f (ConvertTo-OrchestrationInlineList -Items $item.missing_prerequisites))
+            }
+        }
+        $lines += ""
+    }
+
+    if ($Result.PSObject.Properties.Name -contains "skills_deferred_until_execution") {
+        $lines += @("## Skills Deferred Until Execution", "")
+        if ($Result.skills_deferred_until_execution.Count -eq 0) {
+            $lines += "- none"
+        } else {
+            foreach ($item in $Result.skills_deferred_until_execution) {
+                $lines += ("- {0}: {1}" -f (Format-OrchestrationSkillLabel -Skill $item), (ConvertTo-OrchestrationInlineValue -Value $item.reason))
+            }
+        }
+        $lines += ""
+    }
+
+    if ($Result.PSObject.Properties.Name -contains "skills_not_applicable") {
+        $lines += @("## Skills Not Applicable", "")
+        if ($Result.skills_not_applicable.Count -eq 0) {
+            $lines += "- none"
+        } else {
+            foreach ($item in $Result.skills_not_applicable) {
+                $lines += ("- {0}: {1}" -f (ConvertTo-OrchestrationInlineValue -Value $item.display_name), (ConvertTo-OrchestrationInlineValue -Value $item.reason))
+            }
+        }
+        $lines += ""
+    }
+
+    if ($Result.PSObject.Properties.Name -contains "subtask_to_skill_map") {
+        $lines += @("## Subtask To Skill Map", "")
+        if ($Result.subtask_to_skill_map.Count -eq 0) {
+            $lines += "- none"
+        } else {
+            foreach ($item in $Result.subtask_to_skill_map) {
+                $lines += ("- [{0}] {1}" -f (ConvertTo-OrchestrationInlineValue -Value $item.subtask_id), (ConvertTo-OrchestrationInlineValue -Value $item.subtask_title))
+                $lines += ("  - recommended: {0}" -f (Format-OrchestrationSkillLabel -Skill $item.recommended_skill))
+                if ($item.alternate_skills.Count -eq 0) {
+                    $lines += "  - alternates: none"
+                } else {
+                    $alternates = @()
+                    foreach ($alternate in $item.alternate_skills) {
+                        $alternates += (Format-OrchestrationSkillLabel -Skill $alternate)
+                    }
+                    $lines += ("  - alternates: {0}" -f ($alternates -join "; "))
+                }
+                $lines += ("  - reason: {0}" -f (ConvertTo-OrchestrationInlineValue -Value $item.routing_reason))
+                $lines += ("  - manual confirmation required: {0}" -f (([bool]$item.manual_confirmation_required).ToString().ToLowerInvariant()))
+            }
         }
         $lines += ""
     }
@@ -560,6 +737,10 @@ function Write-OrchestrationApprovalRequest {
 
     if ($Result.PSObject.Properties.Name -contains "approval_reason") {
         $lines += @("## Why approval is required", "", $Result.approval_reason, "")
+    }
+
+    if (($Result.PSObject.Properties.Name -contains "skill_routing_summary") -and -not [string]::IsNullOrWhiteSpace([string]$Result.skill_routing_summary)) {
+        $lines += @("## Skill routing note", "", $Result.skill_routing_summary, "")
     }
 
     if ($Result.PSObject.Properties.Name -contains "recommended_next_step") {

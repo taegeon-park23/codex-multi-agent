@@ -1,0 +1,7 @@
+interface:
+  display_name: "Supervisor Plan"
+  short_description: "Read-only routed planning for supervised work"
+  default_prompt: "Use $supervisor-plan to inspect the project skill catalog first and then produce a read-only supervised plan."
+
+policy:
+  allow_implicit_invocation: false

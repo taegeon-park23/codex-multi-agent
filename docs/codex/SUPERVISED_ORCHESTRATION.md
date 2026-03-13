@@ -48,6 +48,7 @@ Used for:
 Properties:
 - read-only sandboxing
 - no repo mutation
+- begins with skill catalog inspection and deterministic subtask routing
 - produces proposal artifacts and approval requests when execution is recommended
 
 ### Approval-gated execution mode
@@ -81,6 +82,11 @@ Each run writes:
 - mode-specific report copies such as `execution-report.json` or `review-report.json`
 - `events.jsonl`
 - `logs/`
+
+For planning runs, `result.json` and `result.md` should also show:
+- which skills were checked
+- which subtasks matched which skills
+- which skill suggestions are implicit, explicit, blocked, or deferred until execution
 
 ## Worktree usage
 

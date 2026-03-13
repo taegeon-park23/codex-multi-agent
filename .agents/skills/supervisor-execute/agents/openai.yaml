@@ -1,0 +1,7 @@
+interface:
+  display_name: "Supervisor Execute"
+  short_description: "Run an approved execution slice in a worktree"
+  default_prompt: "Use $supervisor-execute to run only the already approved plan slice and then summarize the execution artifacts."
+
+policy:
+  allow_implicit_invocation: false

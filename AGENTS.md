@@ -9,7 +9,7 @@ Use it to route Codex app prompts into Codex CLI worker runs while keeping the h
 
 - `docker/`: generic workspace container for future product work
 - `docs/`: product templates plus Codex orchestration docs
-- `.codex/`: repo-local Codex config, agent configs, instruction files, schemas, and ignored run artifacts
+- `.codex/`: repo-local Codex config, agent configs, instruction files, skill-routing catalog, schemas, and ignored run artifacts
 - `scripts/orchestration/`: PowerShell bridge scripts for supervisor plan, execute, and review flows
 - `.agents/skills/`: repo-local skills that tell the app how to invoke the bridge scripts
 
@@ -60,6 +60,7 @@ Supervisor workflow commands:
 - Codex app is the supervisor surface.
 - Codex CLI is the worker engine.
 - Read-only planning and review are the default.
+- Planning begins with skill inspection against the repo-managed skill catalog and routing rules.
 - Write-capable execution requires prior human approval and isolated worktree mode.
 - Run artifacts are the source of truth for what the worker did or proposed.
 
@@ -77,10 +78,12 @@ Supervisor workflow commands:
 - Prefer boring, maintainable defaults.
 - Keep approval gates visible in code and docs.
 - Keep artifacts machine-readable and human-readable.
+- Surface uncertain skill mappings honestly instead of guessing.
 
 ## Do-not rules
 
 - Do not pretend the app can natively show all CLI sub-agent activity.
+- Do not pretend uncertain skill mappings are confirmed.
 - Do not skip approval gates.
 - Do not silently switch to dangerous full access.
 - Do not choose a product stack unless explicitly approved.
@@ -118,7 +121,9 @@ Reviews should focus on:
 ## How Codex should behave in this repo
 
 - Use repo-local skills when the task matches supervised planning, execution, or review.
+- Start planning by inspecting `.codex/skill-routing/skills-catalog.yaml` and `.codex/skill-routing/routing-rules.md`.
 - Read generated artifacts back to the human instead of pretending to stream hidden CLI internals.
+- Distinguish implicit skill candidates from explicit or execution-deferred recommendations.
 - Keep humans in the loop before any higher-risk step.
 - Treat `.codex/environments/environment.toml` as app-managed.
 - Avoid host-local runtime assumptions for future product code where possible.

@@ -15,25 +15,63 @@
     "per_agent_findings",
     "tests_requested_or_run",
     "risks",
-    "open_questions"
+    "open_questions",
+    "skill_inventory_checked",
+    "skill_routing_summary",
+    "recommended_skill_invocations",
+    "implicit_skill_candidates",
+    "explicit_skill_candidates",
+    "skills_blocked_by_prerequisites",
+    "skills_deferred_until_execution",
+    "skills_not_applicable",
+    "subtask_to_skill_map"
   ],
   "properties": {
-    "run_id": { "type": "string" },
-    "mode": { "type": "string", "const": "plan" },
-    "summary": { "type": "string" },
-    "recommended_next_step": { "type": "string" },
-    "requires_human_approval": { "type": "boolean" },
-    "approval_reason": { "type": ["string", "null"] },
+    "run_id": {
+      "type": "string"
+    },
+    "mode": {
+      "type": "string",
+      "const": "plan"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "recommended_next_step": {
+      "type": "string"
+    },
+    "requires_human_approval": {
+      "type": "boolean"
+    },
+    "approval_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "proposed_worktrees": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "purpose", "base_ref"],
+        "required": [
+          "name",
+          "purpose",
+          "base_ref"
+        ],
         "properties": {
-          "name": { "type": "string" },
-          "purpose": { "type": "string" },
-          "base_ref": { "type": ["string", "null"] }
+          "name": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "base_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       }
     },
@@ -42,15 +80,31 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "title", "owner_role", "mode", "depends_on"],
+        "required": [
+          "id",
+          "title",
+          "owner_role",
+          "mode",
+          "depends_on"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "title": { "type": "string" },
-          "owner_role": { "type": "string" },
-          "mode": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "owner_role": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
           "depends_on": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           }
         }
       }
@@ -60,29 +114,398 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["agent", "summary", "details", "used_multi_agent"],
+        "required": [
+          "agent",
+          "summary",
+          "details",
+          "used_multi_agent"
+        ],
         "properties": {
-          "agent": { "type": "string" },
-          "summary": { "type": "string" },
+          "agent": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
           "details": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
-          "used_multi_agent": { "type": "boolean" }
+          "used_multi_agent": {
+            "type": "boolean"
+          }
         }
       }
-    },
-    "tests_requested_or_run": {
+    },    "tests_requested_or_run": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "risks": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "open_questions": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
+    },
+    "skill_inventory_checked": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "display_name",
+          "invocation_name",
+          "probable_invocation_name",
+          "invocation_name_status",
+          "source_scope",
+          "safe_phase",
+          "mutates_files",
+          "requires_external_context",
+          "confidence_of_mapping"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "invocation_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "probable_invocation_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invocation_name_status": {
+            "type": "string",
+            "enum": [
+              "confirmed",
+              "probable",
+              "needs_manual_confirmation",
+              "unknown"
+            ]
+          },
+          "source_scope": {
+            "type": "string",
+            "enum": [
+              "repo",
+              "user",
+              "system",
+              "admin",
+              "unknown"
+            ]
+          },
+          "safe_phase": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "planning",
+                "execution",
+                "review"
+              ]
+            }
+          },
+          "mutates_files": {
+            "enum": [
+              true,
+              false,
+              "unknown"
+            ]
+          },
+          "requires_external_context": {
+            "type": "boolean"
+          },
+          "confidence_of_mapping": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "skill_routing_summary": {
+      "type": "string"
+    },
+    "recommended_skill_invocations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/routed_skill"
+      }
+    },
+    "implicit_skill_candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/routed_skill"
+      }
+    },
+    "explicit_skill_candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/routed_skill"
+      }
+    },    "skills_blocked_by_prerequisites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "display_name",
+          "invocation_name",
+          "probable_invocation_name",
+          "invocation_name_status",
+          "missing_prerequisites",
+          "blocking_reason"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "invocation_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "probable_invocation_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invocation_name_status": {
+            "type": "string",
+            "enum": [
+              "confirmed",
+              "probable",
+              "needs_manual_confirmation",
+              "unknown"
+            ]
+          },
+          "missing_prerequisites": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "blocking_reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "skills_deferred_until_execution": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "display_name",
+          "invocation_name",
+          "probable_invocation_name",
+          "invocation_name_status",
+          "reason"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "invocation_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "probable_invocation_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "invocation_name_status": {
+            "type": "string",
+            "enum": [
+              "confirmed",
+              "probable",
+              "needs_manual_confirmation",
+              "unknown"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "skills_not_applicable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "display_name",
+          "reason"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "subtask_to_skill_map": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "subtask_id",
+          "subtask_title",
+          "recommended_skill",
+          "alternate_skills",
+          "routing_reason",
+          "manual_confirmation_required"
+        ],
+        "properties": {
+          "subtask_id": {
+            "type": "string"
+          },
+          "subtask_title": {
+            "type": "string"
+          },
+          "recommended_skill": {
+            "$ref": "#/definitions/skill_reference"
+          },
+          "alternate_skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/skill_reference"
+            }
+          },
+          "routing_reason": {
+            "type": "string"
+          },
+          "manual_confirmation_required": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },  "definitions": {
+    "routed_skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "display_name",
+        "invocation_name",
+        "probable_invocation_name",
+        "invocation_name_status",
+        "use_mode",
+        "phase",
+        "reason",
+        "subtasks"
+      ],
+      "properties": {
+        "display_name": {
+          "type": "string"
+        },
+        "invocation_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "probable_invocation_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "invocation_name_status": {
+          "type": "string",
+          "enum": [
+            "confirmed",
+            "probable",
+            "needs_manual_confirmation",
+            "unknown"
+          ]
+        },
+        "use_mode": {
+          "type": "string",
+          "enum": [
+            "implicit",
+            "explicit",
+            "deferred",
+            "not_applicable"
+          ]
+        },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "planning",
+            "execution",
+            "review"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "subtasks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "skill_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "display_name",
+        "invocation_name",
+        "probable_invocation_name",
+        "invocation_name_status"
+      ],
+      "properties": {
+        "display_name": {
+          "type": "string"
+        },
+        "invocation_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "probable_invocation_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "invocation_name_status": {
+          "type": "string",
+          "enum": [
+            "confirmed",
+            "probable",
+            "needs_manual_confirmation",
+            "unknown"
+          ]
+        }
+      }
     }
   }
 }
