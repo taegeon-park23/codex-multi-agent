@@ -2,19 +2,20 @@
 
 ## Purpose
 
-This repository is in bootstrap mode. Favor clarity, reviewability, and Docker-first
-execution over speed or cleverness.
+This repository is a supervised orchestration template.
+Use it to route Codex app prompts into Codex CLI worker runs while keeping the human in the loop.
 
 ## Repo layout
 
-- `docker/`: generic container definitions for repository work
-- `docs/`: product, architecture, planning, QA, review, and Codex workflow docs
-- `.agents/skills/`: future repo-local skills
-- `.codex/config.toml`: repo-scoped Codex defaults
+- `docker/`: generic workspace container for future product work
+- `docs/`: product templates plus Codex orchestration docs
+- `.codex/`: repo-local Codex config, agent configs, instruction files, schemas, and ignored run artifacts
+- `scripts/orchestration/`: PowerShell bridge scripts for supervisor plan, execute, and review flows
+- `.agents/skills/`: repo-local skills that tell the app how to invoke the bridge scripts
 
 ## Commands
 
-Current supported commands:
+Container and workspace commands:
 
 - Validate Compose:
 
@@ -34,66 +35,90 @@ Current supported commands:
   docker compose run --rm workspace bash
   ```
 
-No product-specific build, test, lint, or dev commands exist yet. Add them only
-after the product stack is approved.
+Supervisor workflow commands:
+
+- Plan:
+
+  ```powershell
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts\orchestration\Invoke-SupervisorPlan.ps1 -Task "Describe the task here"
+  ```
+
+- Execute an approved plan:
+
+  ```powershell
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts\orchestration\Invoke-SupervisorExecute.ps1 -PlanRun <run-id> -ApprovalNote "Approved scope: ..."
+  ```
+
+- Review a run:
+
+  ```powershell
+  powershell -NoProfile -ExecutionPolicy Bypass -File scripts\orchestration\Invoke-SupervisorReview.ps1 -TargetRun <run-id>
+  ```
+
+## Operating model
+
+- Codex app is the supervisor surface.
+- Codex CLI is the worker engine.
+- Read-only planning and review are the default.
+- Write-capable execution requires prior human approval and isolated worktree mode.
+- Run artifacts are the source of truth for what the worker did or proposed.
 
 ## Docker-first rules
 
-- Prefer `docker compose` commands over host-local runtimes.
-- Avoid assuming host-installed Node, Python, Java, or similar toolchains.
-- If a task can run inside the `workspace` container, use the container path first.
-- Do not add service containers like Postgres, Redis, or message brokers until the
-  product requires them and the human approves them.
+- Keep Docker-first principles for future product/runtime workflows.
+- Do not force future product work onto host-local Node, Python, or similar runtimes.
+- The orchestration layer is the exception: Codex app and Codex CLI run on the host by necessity.
 
 ## Engineering conventions
 
 - Inspect before changing.
-- Planning happens before implementation.
-- Architecture is reviewed before implementation starts.
-- Keep dependencies minimal and justify each major addition.
-- Keep docs aligned with the current repository state.
-- Use boring, maintainable defaults.
+- Keep the repository generic.
+- Keep role instructions narrow and explicit.
+- Prefer boring, maintainable defaults.
+- Keep approval gates visible in code and docs.
+- Keep artifacts machine-readable and human-readable.
 
 ## Do-not rules
 
-- Do not invent product requirements.
-- Do not scaffold a product framework without approval.
-- Do not bypass approval gates for major dependencies or destructive actions.
-- Do not claim tests passed when no real tests exist.
-- Do not optimize for cloud deployment before the product needs it.
+- Do not pretend the app can natively show all CLI sub-agent activity.
+- Do not skip approval gates.
+- Do not silently switch to dangerous full access.
+- Do not choose a product stack unless explicitly approved.
+- Do not add service containers or heavy frameworks unless the orchestration foundation itself truly needs them.
 
 ## Approval gates
 
 Ask for approval before:
-- choosing or changing the primary application stack
-- adding heavy frameworks
-- adding infrastructure services
-- performing destructive actions
-- changing the repository operating model
+- invoking the execute handoff
+- widening scope beyond the approved plan
+- destructive actions
+- heavy dependency additions
+- infrastructure additions
+- changing the repo operating model again
 
 ## Definition of done
 
-For bootstrap-phase changes:
-- files are small, reviewable, and aligned with current scope
-- Docker-first commands are documented and coherent
-- templates remain generic and do not contain fake product details
-- validation results are explicit
-- open questions are called out clearly
+For this repo's orchestration work:
+- docs match the real workflow
+- scripts create coherent run artifacts
+- schemas are valid JSON
+- read-only vs approved execution is explicit
+- worktree isolation is used for mutating work
+- validation claims are real
 
 ## Review expectations
 
-Reviews should check:
-- scope discipline
-- dependency justification
-- documentation accuracy
-- Docker command coherence
-- future task isolation and worktree friendliness
+Reviews should focus on:
+- approval-model correctness
+- artifact completeness
+- script safety and Windows friendliness
+- doc consistency
+- product-stack neutrality
 
 ## How Codex should behave in this repo
 
-- Inspect first, then propose or implement.
-- Prefer containerized workflows where practical.
-- Keep humans in the loop at major decision points.
-- Treat this repository as foundation-only until the product stack is approved.
-- Avoid host-local runtime assumptions where possible.
-
+- Use repo-local skills when the task matches supervised planning, execution, or review.
+- Read generated artifacts back to the human instead of pretending to stream hidden CLI internals.
+- Keep humans in the loop before any higher-risk step.
+- Treat `.codex/environments/environment.toml` as app-managed.
+- Avoid host-local runtime assumptions for future product code where possible.

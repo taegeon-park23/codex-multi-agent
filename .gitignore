@@ -1,5 +1,7 @@
 .env
+.codex/runs/
 .codex/environments/
+.worktrees/
 .idea/
 .vscode/
 *.log

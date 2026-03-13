@@ -1,16 +1,15 @@
 # Repo-local Skills
 
-Use this directory for future repository-specific Codex skills.
+This repository now includes repo-local skills for supervised planning, approved execution, and read-only review.
 
-Keep each skill:
-- narrow in scope
-- documented with a clear trigger
-- aligned with the Docker-first workflow
-- safe to use without assuming host-local runtimes
+Current skills:
+- `supervisor-plan`
+- `supervisor-execute`
+- `supervisor-review`
 
-Good future candidates:
-- task breakdown generation from approved requirements
-- Docker command helpers for the chosen stack
-- review and release gate helpers
-- worktree bootstrap helpers
-
+Each skill should:
+- keep the app in the supervisor role
+- invoke the PowerShell bridge scripts
+- read back generated artifacts
+- avoid pretending the app can stream CLI child-agent internals
+- preserve human approval checkpoints

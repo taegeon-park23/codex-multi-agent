@@ -1,5 +1,53 @@
-# Repo-scoped Codex defaults for the bootstrap stage.
-# Keep work inside the checked-out repository unless explicitly escalated.
+# Repo-scoped Codex defaults for the supervised orchestration template.
 sandbox_mode = "workspace-write"
+approval_policy = "on-request"
 personality = "pragmatic"
 
+[features]
+multi_agent = true
+
+[agents]
+max_threads = 4
+max_depth = 1
+job_max_runtime_seconds = 900
+
+[agents.planner]
+description = "Read-only planning agent for decomposition, sequencing, open questions, and proposed subtasks."
+config_file = "agents/planner.toml"
+
+[agents.architect]
+description = "Read-only architecture agent for solution shape, dependency boundaries, and worktree suggestions."
+config_file = "agents/architect.toml"
+
+[agents.tester]
+description = "Read-only testing agent for validation strategy, required checks, and explicit gaps."
+config_file = "agents/tester.toml"
+
+[agents.reviewer]
+description = "Read-only review agent for risks, regressions, maintainability, and scope drift."
+config_file = "agents/reviewer.toml"
+
+[agents.implementer]
+description = "Write-capable implementation agent for an already approved slice inside an isolated worktree."
+config_file = "agents/implementer.toml"
+
+[profiles.supervisor_plan]
+sandbox_mode = "read-only"
+approval_policy = "never"
+model_reasoning_effort = "high"
+model_instructions_file = "instructions/supervisor-plan.md"
+web_search = "disabled"
+
+[profiles.supervisor_execute]
+sandbox_mode = "workspace-write"
+approval_policy = "never"
+model_reasoning_effort = "high"
+model_instructions_file = "instructions/supervisor-execute.md"
+web_search = "disabled"
+
+[profiles.supervisor_review]
+sandbox_mode = "read-only"
+approval_policy = "never"
+model_reasoning_effort = "high"
+model_instructions_file = "instructions/supervisor-review.md"
+web_search = "disabled"

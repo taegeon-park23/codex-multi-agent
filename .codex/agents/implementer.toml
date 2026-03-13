@@ -1,0 +1,6 @@
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+model_reasoning_effort = "high"
+model_instructions_file = "../instructions/implementer.md"
+web_search = "disabled"
+
