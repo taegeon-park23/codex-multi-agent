@@ -1,5 +1,7 @@
 # Supervised App-to-CLI Orchestration Template
 
+Korean user guide: [README.ko.md](README.ko.md)
+
 ## What this repository is for
 
 This repository is a bootstrap and operating foundation for future projects.
